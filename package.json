@@ -1,12 +1,12 @@
 {
-  "name": "vscode-sbpf-asm",
-  "displayName": "sbpf-asm",
+  "name": "vscode-sbpf-toolkit",
+  "displayName": "sBPF Toolkit",
   "description": "sBPF Assembly support for VSCode",
   "version": "0.0.7",
   "icon": "icons/logo.png",
-  "publisher": "deanmlittle",
+  "publisher": "blueshift-gg",
   "repository": {
-    "url": "https://github.com/deanmlittle/vscode-sbpf-asm.git"
+    "url": "https://github.com/blueshift-gg/vscode-sbpf-toolkit.git"
   },
   "engines": {
     "vscode": "^1.90.0"

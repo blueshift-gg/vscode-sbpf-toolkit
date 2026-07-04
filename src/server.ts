@@ -287,6 +287,28 @@ const opcodes = [
   { code: 'jslt', label: 'jslt_reg', description: 'jslt dst, src, +off\n\nPC += off if dst < src (signed)', snippet: snippets.ja_reg },
   { code: 'jsle', label: 'jsle_imm', description: 'jsle dst, imm, +off\n\nPC += off if dst <= imm (signed)', snippet: snippets.ja_imm },
   { code: 'jsle', label: 'jsle_reg', description: 'jsle dst, src, +off\n\nPC += off if dst <= src (signed)', snippet: snippets.ja_reg },
+  { code: 'jeq32', label: 'jeq32_imm', description: 'jeq32 dst, imm, +off\n\nPC += off if dst == imm', snippet: snippets.ja_imm },
+  { code: 'jeq32', label: 'jeq32_reg', description: 'jeq32 dst, src, +off\n\nPC += off if dst == src', snippet: snippets.ja_reg },
+  { code: 'jgt32', label: 'jgt32_imm', description: 'jgt32 dst, imm, +off\n\nPC += off if dst > imm', snippet: snippets.ja_imm },
+  { code: 'jgt32', label: 'jgt32_reg', description: 'jgt32 dst, src, +off\n\nPC += off if dst > src', snippet: snippets.ja_reg },
+  { code: 'jge32', label: 'jge32_imm', description: 'jge32 dst, imm, +off\n\nPC += off if dst >= imm', snippet: snippets.ja_imm },
+  { code: 'jge32', label: 'jge32_reg', description: 'jge32 dst, src, +off\n\nPC += off if dst >= src', snippet: snippets.ja_reg },
+  { code: 'jlt32', label: 'jlt32_imm', description: 'jlt32 dst, imm, +off\n\nPC += off if dst < imm', snippet: snippets.ja_imm },
+  { code: 'jlt32', label: 'jlt32_reg', description: 'jlt32 dst, src, +off\n\nPC += off if dst < src', snippet: snippets.ja_reg },
+  { code: 'jle32', label: 'jle32_imm', description: 'jle32 dst, imm, +off\n\nPC += off if dst <= imm', snippet: snippets.ja_imm },
+  { code: 'jle32', label: 'jle32_reg', description: 'jle32 dst, src, +off\n\nPC += off if dst <= src', snippet: snippets.ja_reg },
+  { code: 'jset32', label: 'jset32_imm', description: 'jset32 dst, imm, +off\n\nPC += off if dst & imm', snippet: snippets.ja_imm },
+  { code: 'jset32', label: 'jset32_reg', description: 'jset32 dst, src, +off\n\nPC += off if dst & src', snippet: snippets.ja_reg },
+  { code: 'jne32', label: 'jne32_imm', description: 'jne32 dst, imm, +off\n\nPC += off if dst != imm', snippet: snippets.ja_imm },
+  { code: 'jne32', label: 'jne32_reg', description: 'jne32 dst, src, +off\n\nPC += off if dst != src', snippet: snippets.ja_reg },
+  { code: 'jsgt32', label: 'jsgt32_imm', description: 'jsgt32 dst, imm, +off\n\nPC += off if dst > imm (signed)', snippet: snippets.ja_imm },
+  { code: 'jsgt32', label: 'jsgt32_reg', description: 'jsgt32 dst, src, +off\n\nPC += off if dst > src (signed)', snippet: snippets.ja_reg },
+  { code: 'jsge32', label: 'jsge32_imm', description: 'jsge32 dst, imm, +off\n\nPC += off if dst >= imm (signed)', snippet: snippets.ja_imm },
+  { code: 'jsge32', label: 'jsge32_reg', description: 'jsge32 dst, src, +off\n\nPC += off if dst >= src (signed)', snippet: snippets.ja_reg },
+  { code: 'jslt32', label: 'jslt32_imm', description: 'jslt32 dst, imm, +off\n\nPC += off if dst < imm (signed)', snippet: snippets.ja_imm },
+  { code: 'jslt32', label: 'jslt32_reg', description: 'jslt32 dst, src, +off\n\nPC += off if dst < src (signed)', snippet: snippets.ja_reg },
+  { code: 'jsle32', label: 'jsle32_imm', description: 'jsle32 dst, imm, +off\n\nPC += off if dst <= imm (signed)', snippet: snippets.ja_imm },
+  { code: 'jsle32', label: 'jsle32_reg', description: 'jsle32 dst, src, +off\n\nPC += off if dst <= src (signed)', snippet: snippets.ja_reg },
   { code: 'call', label: 'call', description: 'call imm\n\nsyscall function call to syscall with key imm', snippet: snippets.call },
   { code: 'exit', label: 'exit', description: 'exit\n\nreturn r0', snippet: snippets.exit },
 ];
@@ -1060,7 +1082,7 @@ function parseInstruction(line: string): ParsedInstruction | null {
     return { opcode, variant: 'none' };
   }
 
-  const jops = ['ja','jeq','jgt','jge','jset','jne','jsgt','jsge','jlt','jle','jslt','jsle'];
+  const jops = ['ja','jeq','jgt','jge','jset','jne','jsgt','jsge','jlt','jle','jslt','jsle','jeq32','jgt32','jge32','jset32','jne32','jsgt32','jsge32','jlt32','jle32','jslt32','jsle32'];
   if (jops.includes(opcode)) {
     if (opcode === 'ja' && args.length === 1) {
       const off = parseOffset(args[0]);
@@ -1100,7 +1122,9 @@ function parseInstruction(line: string): ParsedInstruction | null {
 function describeInstruction(p: ParsedInstruction): { title: string; text: string } | null {
   const jmap: Record<string,string> = {
     jeq: '==', jne: '!=', jgt: '>', jge: '>=', jlt: '<', jle: '<=',
-    jsgt: '>(signed)', jsge: '>=(signed)', jslt: '<(signed)', jsle: '<=(signed)'
+    jsgt: '>(signed)', jsge: '>=(signed)', jslt: '<(signed)', jsle: '<=(signed)',
+    jeq32: '==', jne32: '!=', jgt32: '>', jge32: '>=', jlt32: '<', jle32: '<=',
+    jsgt32: '>(signed)', jsge32: '>=(signed)', jslt32: '<(signed)', jsle32: '<=(signed)'
   };
   if (p.opcode === 'ja' && typeof p.offset === 'number') {
     const dir = p.offset >= 0 ? 'forward' : 'back';
@@ -1112,7 +1136,7 @@ function describeInstruction(p: ParsedInstruction): { title: string; text: strin
     const dir = p.offset >= 0 ? 'forward' : 'back';
     return { title: `${p.opcode} (conditional jump)`, text: `If r${p.dst} ${cmp} ${rhs}, jump ${dir} ${Math.abs(p.offset)} instructions` };
   }
-  if (p.opcode === 'jset' && p.dst !== undefined && typeof p.offset === 'number') {
+  if ((p.opcode === 'jset' || p.opcode === 'jset32') && p.dst !== undefined && typeof p.offset === 'number') {
     const rhs = p.variant === 'reg' ? `r${p.src}` : `${p.imm}`;
     const dir = p.offset >= 0 ? 'forward' : 'back';
     return { title: 'jset (bit test jump)', text: `If (r${p.dst} & ${rhs}) != 0, jump ${dir} ${Math.abs(p.offset)} instructions` };
@@ -1204,7 +1228,9 @@ function formatFields(p: ParsedInstruction): string {
 function jumpVariant(p: ParsedInstruction): string {
   const base = p.opcode === 'ja' ? 'jump' : `jump_${({
     jeq: 'eq', jne: 'ne', jgt: 'gt', jge: 'ge', jlt: 'lt', jle: 'le',
-    jsgt: 'sgt', jsge: 'sge', jslt: 'slt', jsle: 'sle', jset: 'set'
+    jsgt: 'sgt', jsge: 'sge', jslt: 'slt', jsle: 'sle', jset: 'set',
+    jeq32: 'eq32', jne32: 'ne32', jgt32: 'gt32', jge32: 'ge32', jlt32: 'lt32', jle32: 'le32',
+    jsgt32: 'sgt32', jsge32: 'sge32', jslt32: 'slt32', jsle32: 'sle32', jset32: 'set32'
   } as any)[p.opcode]}`;
   if (p.opcode === 'ja') return base;
   return `${base}_${p.variant === 'reg' ? 'reg' : 'imm'}`;

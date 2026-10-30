@@ -285,7 +285,7 @@ function parseInstruction(line: string): ParsedInstruction | null {
     return { opcode, variant: 'none' };
   }
 
-  const jops = ['ja','jeq','jgt','jge','jset','jne','jsgt','jsge','jlt','jle','jslt','jsle'];
+  const jops = ['ja','jeq','jgt','jge','jset','jne','jsgt','jsge','jlt','jle','jslt','jsle','jeq32','jgt32','jge32','jset32','jne32','jsgt32','jsge32','jlt32','jle32','jslt32','jsle32'];
   if (jops.includes(opcode)) {
     if (opcode === 'ja' && args.length === 1) {
       const off = parseOffset(args[0]);
@@ -325,7 +325,9 @@ function parseInstruction(line: string): ParsedInstruction | null {
 function describeInstruction(p: ParsedInstruction): { title: string; text: string } | null {
   const jmap: Record<string,string> = {
     jeq: '==', jne: '!=', jgt: '>', jge: '>=', jlt: '<', jle: '<=',
-    jsgt: '>(signed)', jsge: '>=(signed)', jslt: '<(signed)', jsle: '<=(signed)'
+    jsgt: '>(signed)', jsge: '>=(signed)', jslt: '<(signed)', jsle: '<=(signed)',
+    jeq32: '==', jne32: '!=', jgt32: '>', jge32: '>=', jlt32: '<', jle32: '<=',
+    jsgt32: '>(signed)', jsge32: '>=(signed)', jslt32: '<(signed)', jsle32: '<=(signed)'
   };
   if (p.opcode === 'ja' && typeof p.offset === 'number') {
     const dir = p.offset >= 0 ? 'forward' : 'back';
@@ -338,7 +340,7 @@ function describeInstruction(p: ParsedInstruction): { title: string; text: strin
     const dir = offNum >= 0 ? 'forward' : 'back';
     return { title: p.opcode, text: `If r${p.dst} ${cmp} ${rhs}, jump ${dir} ${Math.abs(offNum)} instructions` };
   }
-  if (p.opcode === 'jset' && p.dst !== undefined && p.offset !== undefined) {
+  if ((p.opcode === 'jset' || p.opcode === 'jset32') && p.dst !== undefined && p.offset !== undefined) {
     const rhs = p.variant === 'reg' ? `r${p.src}` : `${p.imm}`;
     const offNum = typeof p.offset === 'number' ? p.offset : 0;
     const dir = offNum >= 0 ? 'forward' : 'back';
@@ -434,7 +436,9 @@ function describeInstruction(p: ParsedInstruction): { title: string; text: strin
 function jumpVariant(p: ParsedInstruction): string {
   const base = p.opcode === 'ja' ? 'jump' : `jump_${({
     jeq: 'eq', jne: 'ne', jgt: 'gt', jge: 'ge', jlt: 'lt', jle: 'le',
-    jsgt: 'sgt', jsge: 'sge', jslt: 'slt', jsle: 'sle', jset: 'set'
+    jsgt: 'sgt', jsge: 'sge', jslt: 'slt', jsle: 'sle', jset: 'set',
+    jeq32: 'eq32', jne32: 'ne32', jgt32: 'gt32', jge32: 'ge32', jlt32: 'lt32', jle32: 'le32',
+    jsgt32: 'sgt32', jsge32: 'sge32', jslt32: 'slt32', jsle32: 'sle32', jset32: 'set32'
   } as any)[p.opcode]}`;
   if (p.opcode === 'ja') return base;
   return `${base}_${p.variant === 'reg' ? 'reg' : 'imm'}`;
